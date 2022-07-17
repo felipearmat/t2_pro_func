@@ -1,0 +1,24 @@
+{
+  "name": "t2_prog_func",
+  "version": "0.0.1",
+  "description": "Trabalho de Prog. Funcional",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/felipearmat/t2_pro_func.git"
+  },
+  "keywords": [
+    "js",
+    "funtional",
+    "node"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/felipearmat/t2_pro_func/issues"
+  },
+  "homepage": "https://github.com/felipearmat/t2_pro_func#readme"
+}
