@@ -12,14 +12,39 @@ function compare(a, b) {
   return 0
 }
 
-function topConfirmed(array, qnt = 1) {
-  const sorted = array.sort((value_a, value_b) => {
-    let a = Number(value_a['Confirmed'])
-    let b = Number(value_b['Confirmed'])
-    return compare(b, a)
-  })
+// Função reverse que preserva os valores do array original
+function reverse(array) {
+  return [...array].reverse()
+}
 
-  return sorted.slice(0, qnt)
+// Função sortBy que preserva os valores do array original
+function sortBy(array, key) {
+  return [...array].sort((value_a, value_b) => {
+    const a = Number(value_a[key])
+    const b = Number(value_b[key])
+    return compare(a, b)
+  })
+}
+
+// Função sort que preserva os valores do array original
+function sort(array) {
+  return [...array].sort()
+}
+
+function bottomConfirmed(array, qnt = 1) {
+  return sortBy(array, 'Confirmed').slice(0, qnt)
+}
+
+function topActive(array, qnt = 1) {
+  return reverse(sortBy(array, 'Active')).slice(0, qnt)
+}
+
+function topConfirmed(array, qnt = 1) {
+  return reverse(sortBy(array, 'Confirmed')).slice(0, qnt)
+}
+
+function topDeaths(array, qnt = 1) {
+  return reverse(sortBy(array, 'Deaths')).slice(0, qnt)
 }
 
 function makeEntriesArray(headers, body) {
@@ -34,6 +59,7 @@ function textToObject(text) {
   const textArr = text.split('\n')
 
   const arr = textArr.map(item => {
+    // Quebra strings nas vírgulas, exceto quando circundadas por aspas duplas
     return item.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
   })
 
@@ -44,12 +70,8 @@ function textToObject(text) {
     return Object.fromEntries(entry)
   })
 
-  return result
-}
-
-function startApp(text) {
-  const obj = textToObject(text)
-  console.log(topConfirmed(obj, 3))
+  // O ultimo item do array acaba sempre sendo invalido
+  return result.slice(0, -1)
 }
 
 function readFromUrl(url) {
@@ -70,8 +92,60 @@ function readFromFile(file) {
   })
 }
 
+function resp1(object) {
+  const resp = topConfirmed(object, 3).map(item => {
+    if (item['Province_State']) {
+      return item['Province_State'] + ' (' + item['Country_Region'] + ')'
+    }
+    return item['Country_Region']
+  })
+  return sort(resp)
+}
+
+function resp2(object) {
+  const active = topActive(object, 10)
+  const confirmed = bottomConfirmed(active, 5)
+  return confirmed.reduce((acc, item) => {
+    return acc + Number(item['Deaths'])
+  }, 0)
+}
+
+function resp3(object) {
+  const filtered = object.filter(item => {
+    return Number(item['Lat']) < 0;
+  })
+  return topDeaths(filtered)[0]['Deaths']
+}
+
+function resp4(object) {
+  const filtered = object.filter(item => {
+    return Number(item['Lat']) > 0;
+  })
+  return topDeaths(filtered)[0]['Deaths']
+}
+
+function resp5(object) {
+  const filtered = object.filter(item => {
+    return Number(item['Confirmed']) >= 1000000;
+  })
+  return filtered.reduce((acc, item) => {
+    return acc + Number(item['Active'])
+  }, 0)
+}
+
+function startApp(text) {
+  const obj = textToObject(text)
+
+  console.log(`\n- As cidades com mais confirmações: ${resp1(obj)}`)
+  console.log(`\n- Dentre os dez países com maiores valores de "Active", a soma dos "Deaths" dos cinco países com menores valres de "Confirmed": ${resp2(obj)}`)
+  console.log(`\n- O maior valor de "Deaths" entre os países do hemisfério sul: ${resp3(obj)}`)
+  console.log(`\n- O maior valor de "Deaths" entre os países do hemisfério norte: ${resp4(obj)}`)
+  console.log(`\n- A soma de "Active" de todos os países em que "Confirmed" é maior o igual que 1.000.000: ${resp5(obj)}`)
+  console.log("\n")
+}
+
 function main() {
-  let target = process.argv[2] || csvUrl
+  const target = process.argv[2] || csvUrl
 
   if (target !== csvUrl) {
     readFromFile(target)
