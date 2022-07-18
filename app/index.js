@@ -34,11 +34,11 @@ function textToObject(text) {
   const textArr = text.split('\n')
 
   const arr = textArr.map(item => {
-    return item.split(',')
+    return item.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
   })
 
   const headers = arr[0]
-  const body = arr.slice(1, -1)
+  const body = arr.slice(1)
 
   const result = makeEntriesArray(headers, body).map(entry => {
     return Object.fromEntries(entry)
