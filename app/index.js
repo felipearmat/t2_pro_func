@@ -2,6 +2,26 @@ const fs = require('fs')
 
 const csvUrl = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/01-01-2021.csv"
 
+function compare(a, b) {
+  if (a < b) {
+    return -1
+  }
+  if (a > b) {
+    return 1
+  }
+  return 0
+}
+
+function topConfirmed(array, qnt = 1) {
+  const sorted = array.sort((value_a, value_b) => {
+    let a = Number(value_a['Confirmed'])
+    let b = Number(value_b['Confirmed'])
+    return compare(b, a)
+  })
+
+  return sorted.slice(0, qnt)
+}
+
 function makeEntriesArray(headers, body) {
   return body.map(value => {
     return value.map((item, index) => {
@@ -29,7 +49,7 @@ function textToObject(text) {
 
 function startApp(text) {
   const obj = textToObject(text)
-  console.log(obj)
+  console.log(topConfirmed(obj, 3))
 }
 
 function readFromUrl(url) {
