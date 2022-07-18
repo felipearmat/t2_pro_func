@@ -1,3 +1,7 @@
+// Alunos:
+//   Felipe Araujo Matos  RA: 5968691
+//   Caio O. B. Gaudencio RA: 10415227
+
 const fs = require('fs')
 
 const csvUrl = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/01-01-2021.csv"
